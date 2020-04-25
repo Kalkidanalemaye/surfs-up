@@ -1,9 +1,3 @@
-from flask import Flask
-app = Flask(__name__)
-@app.route('/')
-def hello_world():
-	return 'Hello world'
-
 import datetime as dt
 import numpy as np
 import pandas as pd
@@ -13,33 +7,21 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 from flask import Flask, jsonify
 
+
 engine = create_engine("sqlite:///hawaii.sqlite")
-
-
+Base = automap_base()
 Base.prepare(engine, reflect=True)
-
 Measurement = Base.classes.measurement
 Station = Base.classes.station
-
 session = Session(engine)
 
+
 app = Flask(__name__)
-
-import app
-
-print("example __name__ = %s", __name__)
-
-if __name__ == "__main__":
-    print("example is being run directly.")
-else:
-    print("example is being imported")
-
-@app.route("/")
-
+@app.route('/')
 def welcome():
     return(
     '''
-    Welcome to the Climate Analysis API!
+    Welcome to the Cate Analysis API!
     Available Routes:
     /api/v1.0/precipitation
     /api/v1.0/stations
@@ -54,15 +36,11 @@ def precipitation():
    precip = {date: prcp for date, prcp in precipitation}
    return jsonify(precip)
 
-
-
-
 @app.route("/api/v1.0/stations")
 def stations():
     results = session.query(Station.station).all()
     stations = list(np.ravel(results))
     return jsonify(stations)
-
 
 @app.route('/api/v1.0/tobs')
 def temp_monthly():
@@ -70,7 +48,6 @@ def temp_monthly():
     results = session.query(Measurement.tobs).filter(Measurement.station == 'USC00519281').filter(Measurement.date >= prev_year).all()
     temps = list(np.ravel(results)) 
     return jsonify(temps)
-
 
 @app.route("/api/v1.0/temp/<start>")
 @app.route("/api/v1.0/temp/<start>/<end>")
@@ -85,7 +62,6 @@ def stats(start=None, end=None):
     results = session.query(*sel).filter(Measurement.date >= start).filter(Measurement.date <= end).all()
     temps = list(np.ravel(results))
     return jsonify(temps)
- 
-/api/v1.0/temp/2017-06-01/2017-06-30
+
 
 
